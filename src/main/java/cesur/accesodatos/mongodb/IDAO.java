@@ -1,4 +1,4 @@
-package cesur.accesodatos;
+package cesur.accesodatos.mongodb;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ public interface IDAO {
 
 	public Employee findEmployeeById(Object id);
 
-	public Employee addEmployee(Employee employee);
+	public void addEmployee(Employee employee);
 
 	public Employee updateEmployee(Object id);
 
@@ -18,7 +18,7 @@ public interface IDAO {
 
 	public Department findDepartmentById(Object id);
 
-	public Department addDepartment(Department department);
+	public void addDepartment(Department department);
 
 	public Department updateDepartment(Object id);
 
