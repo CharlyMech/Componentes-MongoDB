@@ -37,4 +37,4 @@ build/
 ### Mac OS ###
 .DS_Store
 
-Main.java
+!**/src/main/**/Main.java
