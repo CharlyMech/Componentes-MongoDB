@@ -284,13 +284,17 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 		if (this.connectionFlag) {
 			String row = "+" + "-".repeat(7) + "+" + "-".repeat(16) + "+" + "-".repeat(16) + "+" + "-".repeat(7) + "+";
 			List<Employee> employees = this.findAllEmployees();
-			System.out.println(row);
-			System.out.printf("| %-5s | %-14s | %-14s | %-5s |\n", "EMPNO", "NOMBRE", "PUESTO", "DEPNO");
-			System.out.println(row);
-			for(Employee e : employees) {
-				System.out.printf("| %-5s | %-14s | %-14s | %-5s |\n", e.getEmpno(), e.getName(), e.getPosition(), e.getDepno());
+			if(employees != null) {
+				System.out.println(row);
+				System.out.printf("| %-5s | %-14s | %-14s | %-5s |\n", "EMPNO", "NOMBRE", "PUESTO", "DEPNO");
+				System.out.println(row);
+				for (Employee e : employees) {
+					System.out.printf("| %-5s | %-14s | %-14s | %-5s |\n", e.getEmpno(), e.getName(), e.getPosition(), e.getDepno());
+				}
+				System.out.println(row);
+			} else {
+				System.out.println("There are currently no Employees stored");
 			}
-			System.out.println(row);
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
