@@ -19,8 +19,12 @@ public class Department {
 	}
 
 	// Class methods
-	public Department fromDocumentToDepartment(Document deptDoc) {
-		return null;
+	public Department fromDocumentToDepartment(Document doc) {
+		Department dept = new Department();
+		dept.setDepno(doc.getInteger("depno"));
+		dept.setName(doc.getString("nombre"));
+		dept.setLocation(doc.getString("ubicacion"));
+		return dept;
 	}
 
 	// GETTERS //

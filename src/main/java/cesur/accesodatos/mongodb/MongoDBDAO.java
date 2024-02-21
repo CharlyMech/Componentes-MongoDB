@@ -97,7 +97,20 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public List<Department> findAllDepartments() {
 		if (this.connectionFlag) {
-			return null;
+			List<Department> departmentList = new ArrayList<Department>();
+			if (this.connectionFlag) {
+				MongoCollection<Document> departments = this.db.getCollection("departamento");
+				try (MongoCursor<Document> cursor = departments.find().sort(Sorts.ascending("depno")).iterator()) {
+					while (cursor.hasNext()) {
+						Document deptDoc = cursor.next();
+						departmentList.add((new Department()).fromDocumentToDepartment(deptDoc));
+					}
+				}
+				return departmentList;
+			} else {
+				System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
+				return null;
+			}
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 			return null;
@@ -336,7 +349,19 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void executeFindAllDepartments() {
 		if (this.connectionFlag) {
-
+			String row = "+" + "-".repeat(7) + "+" + "-".repeat(20) + "+" + "-".repeat(16) + "+";
+			List<Department> departments = this.findAllDepartments();
+			if(departments != null) {
+				System.out.println(row);
+				System.out.printf("| %-5s | %-18s | %-14s |\n", "DEPNO", "NOMBRE", "UBICACION");
+				System.out.println(row);
+				for (Department d : departments) {
+					System.out.printf("| %-5s | %-18s | %-14s |\n", d.getDepno(), d.getName(), d.getLocation());
+				}
+				System.out.println(row);
+			} else {
+				System.out.println("There are currently no Department stored");
+			}
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
