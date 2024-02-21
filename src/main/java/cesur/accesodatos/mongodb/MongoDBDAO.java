@@ -19,6 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import static com.mongodb.client.model.Filters.eq;
+
 public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	// Terminal outputs and colors
 	static final String BLACK_FONT = "\u001B[30m";
@@ -59,7 +61,13 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public Employee findEmployeeById(Object id) {
 		if (this.connectionFlag) {
-			return null;
+			MongoCollection<Document> employees = this.db.getCollection("empleado");
+			Document doc = employees.find(eq("empno", id)).first();
+			if (doc == null) {
+				return null;
+			}
+			Employee emp = (new Employee()).fromDocumentToEmployee(doc);
+			return emp;
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 			return null;
@@ -218,6 +226,8 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 			}
 			this.connectionFlag = true;
 			return true;
+			// TODO
+			//! BUG!! The DB name must be checked before executing the menu or setting connectionFlag to true
 		} catch (MongoException me) { // Catch MongoException
 			System.err.println("ERROR: MongoException error reported: " + me.getMessage());
 		} catch (IOException ioe) {
@@ -316,7 +326,24 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void executeFindEmployeeByID() {
 		if (this.connectionFlag) {
-
+			BufferedReader reader = new BufferedReader(this.isr); // To read user input
+			try {
+				System.out.println("Insert Employee's ID:");
+				System.out.print(USER_INPUT);
+				String input = reader.readLine();
+				if(!input.matches("\\d+")) { // Check if the output is not numeric
+					System.err.println("ERROR: Please provide a valid Employee ID. Employee's ID are Integer values");
+					return;
+				}
+				Employee returnEmp = this.findEmployeeById(Integer.parseInt(input));
+				if (returnEmp != null) {
+					System.out.printf("Employee information:\n\t- ID: %s\n\t- NAME: %s\n\t- ROLE: %s\n\t- DEPNO: %s\n", returnEmp.getEmpno(), returnEmp.getName(), returnEmp.getPosition(), returnEmp.getDepno());
+				} else { // There is no Employee with the indicated ID
+					System.out.println("There is no Employee with EMPNO " + input);
+				}
+			} catch (IOException ioe) {
+				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
+			}
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
