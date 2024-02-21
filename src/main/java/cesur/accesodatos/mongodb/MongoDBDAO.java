@@ -45,10 +45,11 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 			MongoCollection<Document> employees = this.db.getCollection("empleado");
 			try (MongoCursor<Document> cursor = employees.find().sort(Sorts.ascending("empno")).iterator()) {
 				while (cursor.hasNext()) {
-					System.out.println(cursor.next().toJson());
+					Document empDoc = cursor.next();
+					employeeList.add((new Employee()).fromDocumentToEmployee(empDoc));
 				}
 			}
-			return null;
+			return employeeList;
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 			return null;
@@ -281,7 +282,15 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void executeFindAllEmployees() {
 		if (this.connectionFlag) {
-
+			String row = "+" + "-".repeat(7) + "+" + "-".repeat(16) + "+" + "-".repeat(16) + "+" + "-".repeat(7) + "+";
+			List<Employee> employees = this.findAllEmployees();
+			System.out.println(row);
+			System.out.printf("| %-5s | %-14s | %-14s | %-5s |\n", "EMPNO", "NOMBRE", "PUESTO", "DEPNO");
+			System.out.println(row);
+			for(Employee e : employees) {
+				System.out.printf("| %-5s | %-14s | %-14s | %-5s |\n", e.getEmpno(), e.getName(), e.getPosition(), e.getDepno());
+			}
+			System.out.println(row);
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}

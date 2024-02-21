@@ -1,5 +1,7 @@
 package cesur.accesodatos.mongodb;
 
+import org.bson.Document;
+
 public class Employee {
 	// Class variables
 	private Integer empno;
@@ -16,6 +18,16 @@ public class Employee {
 	}
 
 	public Employee() { // Just in case
+	}
+
+	// Class methods
+	public Employee fromDocumentToEmployee(Document doc) {
+		Employee emp = new Employee();
+		emp.setEmpno(doc.getInteger("empno"));
+		emp.setName(doc.getString("nombre"));
+		emp.setPosition(doc.getString("puesto"));
+		emp.setDepno(doc.getInteger("depno"));
+		return emp;
 	}
 
 	// GETTERS //
@@ -50,5 +62,16 @@ public class Employee {
 
 	public void setDepno(Integer depno) {
 		this.depno = depno;
+	}
+
+	// TO STRING //
+	@Override
+	public String toString() {
+		return "Employee{" +
+				"empno=" + empno +
+				", name='" + name + '\'' +
+				", position='" + position + '\'' +
+				", depno=" + depno +
+				'}';
 	}
 }
