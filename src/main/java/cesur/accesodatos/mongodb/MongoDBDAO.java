@@ -351,7 +351,8 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				}
 				Employee returnEmp = this.findEmployeeById(Integer.parseInt(input));
 				if (returnEmp != null) {
-					System.out.printf("Employee information:\n\t- ID: %s\n\t- NAME: %s\n\t- ROLE: %s\n\t- DEPNO: %s\n", returnEmp.getEmpno(), returnEmp.getName(), returnEmp.getPosition(), returnEmp.getDepno());
+					System.out.println("Employee's information:");
+					System.out.println(returnEmp.toString());
 				} else { // There is no Employee with the indicated ID
 					System.out.println("There is no Employee with EMPNO " + input);
 				}
@@ -464,7 +465,8 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				}
 				Department returnDept = this.findDepartmentById(Integer.parseInt(input));
 				if (returnDept != null) {
-					System.out.printf("Department information:\n\t- ID: %s\n\t- NAME: %s\n\t- LOCATION: %s\n", returnDept.getDepno(), returnDept.getName(), returnDept.getLocation());
+					System.out.println("Department's information:");
+					System.out.println(returnDept.toString());
 				} else { // There is no Employee with the indicated ID
 					System.out.println("There is no Employee with EMPNO " + input);
 				}
