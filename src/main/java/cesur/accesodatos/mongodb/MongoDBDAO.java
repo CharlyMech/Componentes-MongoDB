@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 
 public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	// Terminal outputs and colors
@@ -77,6 +78,13 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void addEmployee(Employee employee) {
 		if (this.connectionFlag) {
+			MongoCollection<Document> employees = this.db.getCollection("empleado");
+			Document doc = new Document()
+					.append("empno", employee.getEmpno())
+					.append("nombre", employee.getName())
+					.append("puesto", employee.getPosition())
+					.append("depno", employee.getDepno());
+			employees.insertOne(doc);
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
@@ -128,7 +136,13 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public Department findDepartmentById(Object id) {
 		if (this.connectionFlag) {
-			return null;
+			MongoCollection<Document> departments = this.db.getCollection("departamento");
+			Document doc = departments.find(eq("depno", id)).first();
+			if (doc == null) {
+				return null;
+			}
+			Department dept = (new Department()).fromDocumentToDepartment(doc);
+			return dept;
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 			return null;
@@ -352,6 +366,48 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void executeAddEmployee() {
 		if (this.connectionFlag) {
+			BufferedReader reader = new BufferedReader(this.isr); // To read user input
+			try {
+				System.out.println("Insert new Employee's ID:");
+				System.out.print(USER_INPUT);
+				String id = reader.readLine();
+				if(!id.matches("\\d+")) { // Check if the output is not numeric
+					System.err.println("ERROR: Please provide a valid Employee ID. Employee's ID are Integer values");
+					return;
+				} else if (findEmployeeById(Integer.parseInt(id)) != null) { // There is already an Employee with that ID
+					System.err.println("ERROR: There is already an Employee with the same ID");
+					return;
+				}
+				System.out.println("Insert new Employee's NAME:");
+				System.out.print(USER_INPUT);
+				if(!id.matches("\\d+")) { // Check if the output is not numeric
+					System.err.println("ERROR: Please provide a valid Employee ID. Employee's ID are Integer values");
+					return;
+				} else if (this.findEmployeeById(Integer.parseInt(id)) != null) { // There's an Employee with the introduced ID
+					System.err.println("ERROR: There's already an Employee with the introduced ID. Try another one");
+					return;
+				}
+				String name = reader.readLine();
+				System.out.println("Insert new Employee's ROLE:");
+				System.out.print(USER_INPUT);
+				String role = reader.readLine();
+				System.out.println("Insert new Employee's DEPNO:");
+				System.out.print(USER_INPUT);
+				String depno = reader.readLine();
+				if(!depno.matches("\\d+")) { // Check if the output is not numeric
+					System.err.println("ERROR: Please provide a valid Department ID. Departments' ID are Integer values");
+					return;
+				} else if (findDepartmentById(Integer.parseInt(depno)) == null) { // There is no Department with introduced DEPNO
+					System.err.println("ERROR: There is no Department with DEPNO " + depno);
+					return;
+				}
+				// Everything is good to execute the method
+				Employee newEmployee = new Employee(Integer.parseInt(id), name, role, Integer.parseInt(depno)); // Create Employee object
+				this.addEmployee(newEmployee);
+				System.out.printf("%sNew Employee added successfully!%s\n", GREEN_FONT, RESET);
+			} catch (IOException ioe) {
+				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
+			}
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
@@ -397,6 +453,24 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void executeFindDepartmentByID() {
 		if (this.connectionFlag) {
+			BufferedReader reader = new BufferedReader(this.isr); // To read user input
+			try {
+				System.out.println("Insert Department's ID:");
+				System.out.print(USER_INPUT);
+				String input = reader.readLine();
+				if(!input.matches("\\d+")) { // Check if the output is not numeric
+					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
+					return;
+				}
+				Department returnDept = this.findDepartmentById(Integer.parseInt(input));
+				if (returnDept != null) {
+					System.out.printf("Department information:\n\t- ID: %s\n\t- NAME: %s\n\t- LOCATION: %s\n", returnDept.getDepno(), returnDept.getName(), returnDept.getLocation());
+				} else { // There is no Employee with the indicated ID
+					System.out.println("There is no Employee with EMPNO " + input);
+				}
+			} catch (IOException ioe) {
+				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
+			}
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
