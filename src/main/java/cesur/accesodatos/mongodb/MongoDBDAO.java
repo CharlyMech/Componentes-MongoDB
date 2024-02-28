@@ -6,6 +6,7 @@ import com.mongodb.MongoException;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -147,7 +149,13 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public Employee deleteEmployee(Object id) {
 		if (this.connectionFlag) {
-			return null;
+			MongoCollection<Document> employees = this.db.getCollection("empleado");
+			Employee deletedEmployee = (new Employee()).fromDocumentToEmployee(Objects.requireNonNull(employees.find(eq("empno", id)).first())); // This is checked not to be null
+			Bson query = eq("empno", id);
+			DeleteResult result = employees.deleteOne(query); // Execute delete operation
+			System.out.println("Employee deleted! " + result.getDeletedCount());
+			// Return deleted Employee object
+			return deletedEmployee;
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 			return null;
