@@ -218,7 +218,44 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public Department updateDepartment(Object id) {
 		if (this.connectionFlag) {
-			return null;
+			BufferedReader reader = new BufferedReader(this.isr); // To read user input
+			MongoCollection<Document> departments = this.db.getCollection("departamento");
+			Document doc = departments.find(eq("depno", id)).first(); // Get Department's Document to be updated
+			try {
+				if (this.connectionFlag) {
+					System.out.println("Insert updated Department's NAME:");
+					System.out.print(USER_INPUT);
+					String updateName = reader.readLine();
+					if (updateName.isEmpty()) {
+						System.err.println("ERROR: You can't leave the information empty");
+						return null;
+					}
+					System.out.println("Insert updated Department's LOCATION:");
+					System.out.print(USER_INPUT);
+					String updateLocation = reader.readLine();
+					if (updateLocation.isEmpty()) {
+						System.err.println("ERROR: You can't leave the information empty");
+						return null;
+					}
+					// Everything is good -> Update information in DB and create Department object to be returned
+					Bson updates = Updates.combine( // Specify new updates to the Document
+							Updates.set("nombre", updateName),
+							Updates.set("ubicacion", updateLocation));
+
+					UpdateResult result = departments.updateOne(doc, updates); // Execute update operation
+					System.out.printf("Department with DEPNO %s updated successfully!!\n->%s\n",id , result.getModifiedCount());
+					return new Department((Integer) id, updateName, updateLocation);
+				} else {
+					System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
+					return null;
+				}
+			} catch (IOException ioe) {
+				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
+				return null;
+			} catch (MongoException me) {
+				System.err.println("ERROR: MongoException error reported: " + me);
+				return null;
+			}
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 			return null;
@@ -567,7 +604,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 					System.out.println("Department's information:");
 					System.out.println(returnDept.toString());
 				} else { // There is no Employee with the indicated ID
-					System.out.println("There is no Employee with EMPNO " + input);
+					System.out.println("There is no Department with DEPNO " + input);
 				}
 			} catch (IOException ioe) {
 				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
@@ -589,7 +626,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
 					return;
 				} else if (findDepartmentById(Integer.parseInt(depno)) != null) { // There is already an Employee with that ID
-					System.err.println("ERROR: There is already an Employee with the same ID");
+					System.err.println("ERROR: There is already an Department with the same ID");
 					return;
 				}
 				System.out.println("Insert new Department's NAME:");
@@ -621,6 +658,26 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void executeUpdateDepartment() {
 		if (this.connectionFlag) {
+			BufferedReader reader = new BufferedReader(this.isr); // To read user input
+			try {
+				System.out.println("Insert Department's ID:");
+				System.out.print(USER_INPUT);
+				String input = reader.readLine();
+				if(!input.matches("\\d+")) { // Check if the output is not numeric
+					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
+					return;
+				}
+				Department returnDept = this.findDepartmentById(Integer.parseInt(input));
+				if (returnDept == null) { // Check if there is an Employee with the indicated ID
+					System.out.println("There is no Department with DEPNO " + input);
+					return;
+				}
+				// Execute IDAO method
+				Department updated = updateDepartment(Integer.parseInt(input));
+				System.out.println(updated.toString());
+			} catch (IOException ioe) {
+				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
+			}
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
