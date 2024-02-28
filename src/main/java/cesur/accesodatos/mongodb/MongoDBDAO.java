@@ -265,7 +265,13 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public Department deleteDepartment(Object id) {
 		if (this.connectionFlag) {
-			return null;
+			MongoCollection<Document> departments = this.db.getCollection("departamento");
+			Department deletedDepartment = (new Department()).fromDocumentToDepartment(Objects.requireNonNull(departments.find(eq("depno", id)).first())); // This is checked not to be null
+			Bson query = eq("depno", id);
+			DeleteResult result = departments.deleteOne(query); // Execute delete operation
+			System.out.println("Department deleted! " + result.getDeletedCount());
+			// Return deleted Employee object
+			return deletedDepartment;
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 			return null;
@@ -686,6 +692,26 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void executeDeleteDepartment() {
 		if (this.connectionFlag) {
+			BufferedReader reader = new BufferedReader(this.isr); // To read user input
+			try {
+				System.out.println("Insert Department's ID:");
+				System.out.print(USER_INPUT);
+				String input = reader.readLine();
+				if(!input.matches("\\d+")) { // Check if the output is not numeric
+					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
+					return;
+				}
+				Department returnDept = this.findDepartmentById(Integer.parseInt(input));
+				if (returnDept == null) { // Check if there is an Employee with the indicated ID
+					System.out.println("There is no Department with DEPNO " + input);
+					return;
+				}
+				// Execute IDAO method
+				Department deleted = deleteDepartment(Integer.parseInt(input));
+				System.out.println(deleted.toString());
+			} catch (IOException ioe) {
+				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
+			}
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
