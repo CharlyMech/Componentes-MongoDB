@@ -491,7 +491,8 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 					return;
 				}
 				// Execute IDAO method
-				updateEmployee(Integer.parseInt(input));
+				Employee updated = updateEmployee(Integer.parseInt(input));
+				System.out.println(updated.toString());
 			} catch (IOException ioe) {
 				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
 			}
@@ -518,7 +519,8 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 					return;
 				}
 				// Execute IDAO method
-				deleteEmployee(Integer.parseInt(input));
+				Employee deleted = deleteEmployee(Integer.parseInt(input));
+				System.out.println(deleted.toString());
 			} catch (IOException ioe) {
 				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
 			}
