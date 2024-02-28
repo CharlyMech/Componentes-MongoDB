@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.in;
 
 public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	// Terminal outputs and colors
@@ -152,6 +151,12 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void addDepartment(Department department) {
 		if (this.connectionFlag) {
+			MongoCollection<Document> departments = this.db.getCollection("departamento");
+			Document doc = new Document()
+					.append("depno", department.getDepno())
+					.append("nombre", department.getName())
+					.append("ubicacion", department.getLocation());
+			departments.insertOne(doc);
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
@@ -381,17 +386,18 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				}
 				System.out.println("Insert new Employee's NAME:");
 				System.out.print(USER_INPUT);
-				if(!id.matches("\\d+")) { // Check if the output is not numeric
-					System.err.println("ERROR: Please provide a valid Employee ID. Employee's ID are Integer values");
-					return;
-				} else if (this.findEmployeeById(Integer.parseInt(id)) != null) { // There's an Employee with the introduced ID
-					System.err.println("ERROR: There's already an Employee with the introduced ID. Try another one");
+				String name = reader.readLine();
+				if(name.isEmpty()) {
+					System.err.println("ERROR: You can't leave the information empty");
 					return;
 				}
-				String name = reader.readLine();
 				System.out.println("Insert new Employee's ROLE:");
 				System.out.print(USER_INPUT);
 				String role = reader.readLine();
+				if(role.isEmpty()) {
+					System.err.println("ERROR: You can't leave the information empty");
+					return;
+				}
 				System.out.println("Insert new Employee's DEPNO:");
 				System.out.print(USER_INPUT);
 				String depno = reader.readLine();
@@ -481,6 +487,39 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void executeAddDepartment() {
 		if (this.connectionFlag) {
+			BufferedReader reader = new BufferedReader(this.isr); // To read user input
+			try {
+				System.out.println("Insert new Department's ID:");
+				System.out.print(USER_INPUT);
+				String depno = reader.readLine();
+				if(!depno.matches("\\d+")) { // Check if the output is not numeric
+					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
+					return;
+				} else if (findDepartmentById(Integer.parseInt(depno)) != null) { // There is already an Employee with that ID
+					System.err.println("ERROR: There is already an Employee with the same ID");
+					return;
+				}
+				System.out.println("Insert new Department's NAME:");
+				System.out.print(USER_INPUT);
+				String name = reader.readLine();
+				if(name.isEmpty()) {
+					System.err.println("ERROR: You can't leave the information empty");
+					return;
+				}
+				System.out.println("Insert new Department's LOCATION:");
+				System.out.print(USER_INPUT);
+				String location = reader.readLine();
+				if(location.isEmpty()) {
+					System.err.println("ERROR: You can't leave the information empty");
+					return;
+				}
+				// Everything is good to execute the method
+				Department newDepartment = new Department(Integer.parseInt(depno), name, location); // Create Employee object
+				this.addDepartment(newDepartment);
+				System.out.printf("%sNew Department added successfully!%s\n", GREEN_FONT, RESET);
+			} catch (IOException ioe) {
+				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
+			}
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
