@@ -281,7 +281,16 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public List<Employee> findEmployeesByDept(Object idDept) {
 		if (this.connectionFlag) {
-			return null;
+			MongoCollection<Document> employees = this.db.getCollection("empleado");
+			Bson equals = eq("depno", idDept);
+			List<Employee> departmentEmployees = new ArrayList<Employee>();
+			try (MongoCursor<Document> cursor = employees.find(equals).iterator()) {
+				while (cursor.hasNext()) {
+					Document doc = cursor.next();
+					departmentEmployees.add((new Employee()).fromDocumentToEmployee(doc));
+				}
+			}
+			return departmentEmployees;
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 			return null;
@@ -720,6 +729,37 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	@Override
 	public void executeFindEmployeesByDept() {
 		if (this.connectionFlag) {
+			BufferedReader reader = new BufferedReader(this.isr); // To read user input
+			try {
+				System.out.println("Insert Department's ID:");
+				System.out.print(USER_INPUT);
+				String input = reader.readLine();
+				if(!input.matches("\\d+")) { // Check if the output is not numeric
+					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
+					return;
+				}
+				Department returnDept = this.findDepartmentById(Integer.parseInt(input));
+				if (returnDept == null) { // Check if there is an Employee with the indicated ID
+					System.out.println("There is no Department with DEPNO " + input);
+					return;
+				}
+				// Execute IDAO method
+				ArrayList<Employee> departmentEmployees = (ArrayList<Employee>) findEmployeesByDept(Integer.parseInt(input));
+				String row = "+" + "-".repeat(7) + "+" + "-".repeat(16) + "+" + "-".repeat(16) + "+";
+				if(departmentEmployees == null || departmentEmployees.isEmpty()) { // No Employees in Department case
+					System.out.println("There are currently no Employees in the Department");
+				} else {
+					System.out.println(row);
+					System.out.printf("| %-5s | %-14s | %-14s |\n", "EMPNO", "NOMBRE", "PUESTO");
+					System.out.println(row);
+					for (Employee e : departmentEmployees) {
+						System.out.printf("| %-5s | %-14s | %-14s |\n", e.getEmpno(), e.getName(), e.getPosition());
+					}
+					System.out.println(row);
+				}
+			} catch (IOException ioe) {
+				System.err.println("ERROR: IOException error reported: " + ioe.getMessage());
+			}
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 		}
