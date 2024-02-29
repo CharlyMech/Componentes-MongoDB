@@ -15,16 +15,7 @@ public class Department {
 		this.location = location;
 	}
 
-	public Department() { // Just in case
-	}
-
-	// Class methods
-	public Department fromDocumentToDepartment(Document doc) {
-		Department dept = new Department();
-		dept.setDepno(doc.getInteger("depno"));
-		dept.setName(doc.getString("nombre"));
-		dept.setLocation(doc.getString("ubicacion"));
-		return dept;
+	public Department() {
 	}
 
 	// GETTERS //

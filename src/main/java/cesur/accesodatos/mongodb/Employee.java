@@ -17,17 +17,7 @@ public class Employee {
 		this.depno = depno;
 	}
 
-	public Employee() { // Just in case
-	}
-
-	// Class methods
-	public Employee fromDocumentToEmployee(Document doc) {
-		Employee emp = new Employee();
-		emp.setEmpno(doc.getInteger("empno"));
-		emp.setName(doc.getString("nombre"));
-		emp.setPosition(doc.getString("puesto"));
-		emp.setDepno(doc.getInteger("depno"));
-		return emp;
+	public Employee() {
 	}
 
 	// GETTERS //
