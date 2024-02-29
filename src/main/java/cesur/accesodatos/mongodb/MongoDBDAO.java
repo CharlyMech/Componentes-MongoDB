@@ -131,7 +131,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 						Updates.set("depno", Integer.parseInt(updateDepno)));
 
 				UpdateResult result = employees.updateOne(doc, updates); // Execute update operation
-				System.out.printf("Emplyee with EMPNO %s updated successfully!!\n->%s\n",id , result.getModifiedCount());
+				System.out.printf("Emplyee with EMPNO %s updated successfully!!\n->%s\n", id, result.getModifiedCount());
 				return new Employee((Integer) id, updateName, updatePosition, Integer.parseInt(updateDepno));
 			} else {
 				System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
@@ -166,19 +166,14 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	public List<Department> findAllDepartments() {
 		if (this.connectionFlag) {
 			List<Department> departmentList = new ArrayList<Department>();
-			if (this.connectionFlag) {
-				MongoCollection<Document> departments = this.db.getCollection("departamento");
-				try (MongoCursor<Document> cursor = departments.find().sort(Sorts.ascending("depno")).iterator()) {
-					while (cursor.hasNext()) {
-						Document deptDoc = cursor.next();
-						departmentList.add((new Department()).fromDocumentToDepartment(deptDoc));
-					}
+			MongoCollection<Document> departments = this.db.getCollection("departamento");
+			try (MongoCursor<Document> cursor = departments.find().sort(Sorts.ascending("depno")).iterator()) {
+				while (cursor.hasNext()) {
+					Document deptDoc = cursor.next();
+					departmentList.add((new Department()).fromDocumentToDepartment(deptDoc));
 				}
-				return departmentList;
-			} else {
-				System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
-				return null;
 			}
+			return departmentList;
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
 			return null;
@@ -243,7 +238,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 							Updates.set("ubicacion", updateLocation));
 
 					UpdateResult result = departments.updateOne(doc, updates); // Execute update operation
-					System.out.printf("Department with DEPNO %s updated successfully!!\n->%s\n",id , result.getModifiedCount());
+					System.out.printf("Department with DEPNO %s updated successfully!!\n->%s\n", id, result.getModifiedCount());
 					return new Department((Integer) id, updateName, updateLocation);
 				} else {
 					System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
@@ -392,7 +387,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				if (optStr.isEmpty()) {
 					System.err.println("ERROR: Please indicate the option number");
 					continue;
-				} else if(!optStr.matches("\\d{1,2}")) {
+				} else if (!optStr.matches("\\d{1,2}")) {
 					System.err.println("ERROR: Please provide a valid input for option! The input must be an Integer value");
 					continue;
 				}
@@ -431,7 +426,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 		if (this.connectionFlag) {
 			String row = "+" + "-".repeat(7) + "+" + "-".repeat(16) + "+" + "-".repeat(16) + "+" + "-".repeat(7) + "+";
 			List<Employee> employees = this.findAllEmployees();
-			if(employees != null) {
+			if (employees != null) {
 				System.out.println(row);
 				System.out.printf("| %-5s | %-14s | %-14s | %-5s |\n", "EMPNO", "NOMBRE", "PUESTO", "DEPNO");
 				System.out.println(row);
@@ -455,7 +450,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert Employee's ID:");
 				System.out.print(USER_INPUT);
 				String input = reader.readLine();
-				if(!input.matches("\\d+")) { // Check if the output is not numeric
+				if (!input.matches("\\d+")) { // Check if the output is not numeric
 					System.err.println("ERROR: Please provide a valid Employee ID. Employee's ID are Integer values");
 					return;
 				}
@@ -482,7 +477,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert new Employee's ID:");
 				System.out.print(USER_INPUT);
 				String id = reader.readLine();
-				if(!id.matches("\\d+")) { // Check if the output is not numeric
+				if (!id.matches("\\d+")) { // Check if the output is not numeric
 					System.err.println("ERROR: Please provide a valid Employee ID. Employee's ID are Integer values");
 					return;
 				} else if (findEmployeeById(Integer.parseInt(id)) != null) { // There is already an Employee with that ID
@@ -492,21 +487,21 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert new Employee's NAME:");
 				System.out.print(USER_INPUT);
 				String name = reader.readLine();
-				if(name.isEmpty()) {
+				if (name.isEmpty()) {
 					System.err.println("ERROR: You can't leave the information empty");
 					return;
 				}
 				System.out.println("Insert new Employee's ROLE:");
 				System.out.print(USER_INPUT);
 				String role = reader.readLine();
-				if(role.isEmpty()) {
+				if (role.isEmpty()) {
 					System.err.println("ERROR: You can't leave the information empty");
 					return;
 				}
 				System.out.println("Insert new Employee's DEPNO:");
 				System.out.print(USER_INPUT);
 				String depno = reader.readLine();
-				if(!depno.matches("\\d+")) { // Check if the output is not numeric
+				if (!depno.matches("\\d+")) { // Check if the output is not numeric
 					System.err.println("ERROR: Please provide a valid Department ID. Departments' ID are Integer values");
 					return;
 				} else if (findDepartmentById(Integer.parseInt(depno)) == null) { // There is no Department with introduced DEPNO
@@ -533,7 +528,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert Employee's ID:");
 				System.out.print(USER_INPUT);
 				String input = reader.readLine();
-				if(!input.matches("\\d+")) { // Check if the output is not numeric
+				if (!input.matches("\\d+")) { // Check if the output is not numeric
 					System.err.println("ERROR: Please provide a valid Employee ID. Employee's ID are Integer values");
 					return;
 				}
@@ -561,7 +556,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert Employee's ID:");
 				System.out.print(USER_INPUT);
 				String input = reader.readLine();
-				if(!input.matches("\\d+")) { // Check if the output is not numeric
+				if (!input.matches("\\d+")) { // Check if the output is not numeric
 					System.err.println("ERROR: Please provide a valid Employee ID. Employee's ID are Integer values");
 					return;
 				}
@@ -586,7 +581,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 		if (this.connectionFlag) {
 			String row = "+" + "-".repeat(7) + "+" + "-".repeat(20) + "+" + "-".repeat(16) + "+";
 			List<Department> departments = this.findAllDepartments();
-			if(departments != null) {
+			if (departments != null) {
 				System.out.println(row);
 				System.out.printf("| %-5s | %-18s | %-14s |\n", "DEPNO", "NOMBRE", "UBICACION");
 				System.out.println(row);
@@ -610,7 +605,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert Department's ID:");
 				System.out.print(USER_INPUT);
 				String input = reader.readLine();
-				if(!input.matches("\\d+")) { // Check if the output is not numeric
+				if (!input.matches("\\d+")) { // Check if the output is not numeric
 					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
 					return;
 				}
@@ -637,7 +632,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert new Department's ID:");
 				System.out.print(USER_INPUT);
 				String depno = reader.readLine();
-				if(!depno.matches("\\d+")) { // Check if the output is not numeric
+				if (!depno.matches("\\d+")) { // Check if the output is not numeric
 					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
 					return;
 				} else if (findDepartmentById(Integer.parseInt(depno)) != null) { // There is already an Employee with that ID
@@ -647,14 +642,14 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert new Department's NAME:");
 				System.out.print(USER_INPUT);
 				String name = reader.readLine();
-				if(name.isEmpty()) {
+				if (name.isEmpty()) {
 					System.err.println("ERROR: You can't leave the information empty");
 					return;
 				}
 				System.out.println("Insert new Department's LOCATION:");
 				System.out.print(USER_INPUT);
 				String location = reader.readLine();
-				if(location.isEmpty()) {
+				if (location.isEmpty()) {
 					System.err.println("ERROR: You can't leave the information empty");
 					return;
 				}
@@ -678,7 +673,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert Department's ID:");
 				System.out.print(USER_INPUT);
 				String input = reader.readLine();
-				if(!input.matches("\\d+")) { // Check if the output is not numeric
+				if (!input.matches("\\d+")) { // Check if the output is not numeric
 					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
 					return;
 				}
@@ -706,7 +701,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert Department's ID:");
 				System.out.print(USER_INPUT);
 				String input = reader.readLine();
-				if(!input.matches("\\d+")) { // Check if the output is not numeric
+				if (!input.matches("\\d+")) { // Check if the output is not numeric
 					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
 					return;
 				}
@@ -734,7 +729,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				System.out.println("Insert Department's ID:");
 				System.out.print(USER_INPUT);
 				String input = reader.readLine();
-				if(!input.matches("\\d+")) { // Check if the output is not numeric
+				if (!input.matches("\\d+")) { // Check if the output is not numeric
 					System.err.println("ERROR: Please provide a valid Department ID. Department's ID are Integer values");
 					return;
 				}
@@ -746,7 +741,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 				// Execute IDAO method
 				ArrayList<Employee> departmentEmployees = (ArrayList<Employee>) findEmployeesByDept(Integer.parseInt(input));
 				String row = "+" + "-".repeat(7) + "+" + "-".repeat(16) + "+" + "-".repeat(16) + "+";
-				if(departmentEmployees == null || departmentEmployees.isEmpty()) { // No Employees in Department case
+				if (departmentEmployees == null || departmentEmployees.isEmpty()) { // No Employees in Department case
 					System.out.println("There are currently no Employees in the Department");
 				} else {
 					System.out.println(row);
