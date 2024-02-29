@@ -44,6 +44,24 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	public MongoDBDAO() {
 	}
 
+	// Class methods
+	private Department fromDocumentToDepartment(Document doc) {
+		Department dept = new Department();
+		dept.setDepno(doc.getInteger("depno"));
+		dept.setName(doc.getString("nombre"));
+		dept.setLocation(doc.getString("ubicacion"));
+		return dept;
+	}
+
+	private Employee fromDocumentToEmployee(Document doc) {
+		Employee emp = new Employee();
+		emp.setEmpno(doc.getInteger("empno"));
+		emp.setName(doc.getString("nombre"));
+		emp.setPosition(doc.getString("puesto"));
+		emp.setDepno(doc.getInteger("depno"));
+		return emp;
+	}
+
 	@Override
 	public List<Employee> findAllEmployees() {
 		List<Employee> employeeList = new ArrayList<Employee>();
@@ -52,7 +70,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 			try (MongoCursor<Document> cursor = employees.find().sort(Sorts.ascending("empno")).iterator()) {
 				while (cursor.hasNext()) {
 					Document empDoc = cursor.next();
-					employeeList.add((new Employee()).fromDocumentToEmployee(empDoc));
+					employeeList.add(this.fromDocumentToEmployee(empDoc));
 				}
 			}
 			return employeeList;
@@ -70,7 +88,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 			if (doc == null) {
 				return null;
 			}
-			Employee emp = (new Employee()).fromDocumentToEmployee(doc);
+			Employee emp = this.fromDocumentToEmployee(doc);
 			return emp;
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
@@ -150,7 +168,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	public Employee deleteEmployee(Object id) {
 		if (this.connectionFlag) {
 			MongoCollection<Document> employees = this.db.getCollection("empleado");
-			Employee deletedEmployee = (new Employee()).fromDocumentToEmployee(Objects.requireNonNull(employees.find(eq("empno", id)).first())); // This is checked not to be null
+			Employee deletedEmployee = this.fromDocumentToEmployee(Objects.requireNonNull(employees.find(eq("empno", id)).first())); // This is checked not to be null
 			Bson query = eq("empno", id);
 			DeleteResult result = employees.deleteOne(query); // Execute delete operation
 			System.out.println("Employee deleted! " + result.getDeletedCount());
@@ -170,7 +188,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 			try (MongoCursor<Document> cursor = departments.find().sort(Sorts.ascending("depno")).iterator()) {
 				while (cursor.hasNext()) {
 					Document deptDoc = cursor.next();
-					departmentList.add((new Department()).fromDocumentToDepartment(deptDoc));
+					departmentList.add(this.fromDocumentToDepartment(deptDoc));
 				}
 			}
 			return departmentList;
@@ -188,7 +206,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 			if (doc == null) {
 				return null;
 			}
-			Department dept = (new Department()).fromDocumentToDepartment(doc);
+			Department dept = this.fromDocumentToDepartment(doc);
 			return dept;
 		} else {
 			System.err.println("ERROR: You must first try to connect to the database with the method .connectDB()");
@@ -261,7 +279,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 	public Department deleteDepartment(Object id) {
 		if (this.connectionFlag) {
 			MongoCollection<Document> departments = this.db.getCollection("departamento");
-			Department deletedDepartment = (new Department()).fromDocumentToDepartment(Objects.requireNonNull(departments.find(eq("depno", id)).first())); // This is checked not to be null
+			Department deletedDepartment = this.fromDocumentToDepartment(Objects.requireNonNull(departments.find(eq("depno", id)).first())); // This is checked not to be null
 			Bson query = eq("depno", id);
 			DeleteResult result = departments.deleteOne(query); // Execute delete operation
 			System.out.println("Department deleted! " + result.getDeletedCount());
@@ -282,7 +300,7 @@ public class MongoDBDAO implements IDAO, ConnectionInterface, Menu {
 			try (MongoCursor<Document> cursor = employees.find(equals).iterator()) {
 				while (cursor.hasNext()) {
 					Document doc = cursor.next();
-					departmentEmployees.add((new Employee()).fromDocumentToEmployee(doc));
+					departmentEmployees.add(this.fromDocumentToEmployee(doc));
 				}
 			}
 			return departmentEmployees;
