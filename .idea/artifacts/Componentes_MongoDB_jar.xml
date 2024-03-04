@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Componentes-MongoDB:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Componentes_MongoDB_jar</output-path>
+    <root id="archive" name="Componentes-MongoDB.jar">
+      <element id="module-output" name="Componentes-MongoDB" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.12.14/mongo-java-driver-3.12.14.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
